@@ -1,9 +1,7 @@
 require("dotenv").config();
 const express = require("express");
-// const { graphqlHTTP } = require("express-graphql");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const pool = require("./config/db"); // Database connection
 const userRoutes = require("./routes/userRoutes");
 
 const app = express();
@@ -15,7 +13,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
-app.use("/api", userRoutes);
+app.use("/auth", userRoutes);
 
 
 app.get("/api/hello", (req, res) => {
