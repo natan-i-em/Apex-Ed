@@ -1,5 +1,5 @@
-import UserProfile from "./components/userProfile";
+import LoginPage from "./login/page";
 
 export default function Page() {
-  return <UserProfile />;
+  return <LoginPage />;
 }
