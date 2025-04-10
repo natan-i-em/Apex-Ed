@@ -6,4 +6,4 @@ router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 router.post("/verify-email-otp", userController.verifyEmailOTP)
 
-module.exports = router;
+// module.exports = router;
