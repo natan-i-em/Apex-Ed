@@ -27,4 +27,20 @@ const sendOTPEmail = async (email, otp) => {
   }
 };
 
-module.exports = { generateOTP, sendOTPEmail };
+const sendOtpPasswordEmail = async (email, otp) => {
+  const msg = {
+    to: email,
+    from: "Apex-ed@outlook.com", // Must be a verified sender in SendGrid
+    subject: "Password Reset OTP",
+    text: `Your OTP is: ${otp}. It will expire in 10 minutes.`,
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log(`OTP sent successfully to ${email}`);
+  } catch (error) {
+    console.error("Error sending OTP email:", error.response?.body || error);
+    throw new Error("Error sending OTP email");
+  }
+}
+module.exports = { generateOTP, sendOTPEmail ,sendOtpPasswordEmail };

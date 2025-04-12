@@ -2,7 +2,7 @@
 
 const bcrypt = require("bcrypt");
 const db = require("../config/db"); // Ensure db is correctly imported
-const { generateOTP, sendOTPEmail } = require("../utility/otpUtil");
+const { generateOTP, sendOTPEmail , sendOtpPasswordEmail} = require("../utility/otpUtil");
 
 const saveUser = async ({ username, email, password, role }) => {
   try {
@@ -73,5 +73,74 @@ const verifyOTP = async (email, otp) => {
     throw new Error("Error verifying OTP: " + error.message);
   }
 };
+const verifyPasswordOTP = async (email, otp) => {
+  try {
+    const user = await getUserByEmail(email);
+    if (!user) {
+      throw new Error("User not found");
+    }
 
-module.exports = { saveUser, getUserByEmail, verifyOTP , verifyPassword};
+    const { otp: storedOtp, otp_expiry } = user;
+
+    // Check if OTP is expired
+    if (Date.now() > otp_expiry) {
+      throw new Error("OTP has expired");
+    }
+
+    // Verify if OTP matches
+    if (storedOtp !== otp) {
+      throw new Error("Invalid OTP");
+    }
+
+    return true; // OTP verified successfully
+  } catch (error) {
+    throw new Error("Error verifying OTP: " + error.message);
+  }
+};
+const getUserById = async (email) => {
+  
+  try {
+    const result = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+    return result.rows[0];
+  } catch (error) {
+    throw new Error("Error fetching user: " + error.message);
+  }
+};
+
+const getForgetPassword = async (email) => {
+  const otp = generateOTP();
+  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000).toISOString();  // 10 minutes from the current time
+
+  try {
+      // Save OTP and its expiry in the database
+  const otpQuery = "UPDATE users SET otp = $1, otp_expiry = $2 WHERE email = $3";
+  const result = await db.query(otpQuery, [otp, otpExpiry, email]);
+
+    // Send OTP to user's email
+    await sendOtpPasswordEmail(email, otp);
+  
+    return result.rows[0];
+  } catch (error) {
+    throw new Error("Error : " + error.message);
+  }
+
+};
+
+const resetPassword = async (email, newPassword) => {
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const query = "UPDATE users SET password = $1 WHERE email = $2";
+    await db.query(query, [hashedPassword, email]);
+  } catch (error) {
+    throw new Error("Error resetting password: " + error.message);
+  }
+};
+
+module.exports = { saveUser, 
+  getUserByEmail,
+  verifyOTP,
+  verifyPassword, 
+  resetPassword,
+  getUserById , 
+  getForgetPassword,
+  verifyPasswordOTP};

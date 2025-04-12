@@ -11,6 +11,7 @@ const { username, email, password } = req.body;
     const newUser = await userModel.saveUser({ username, email, password, role });
     res.status(201).json({
       message: "User signed up successfully. Please verify your email using the OTP sent.",
+      newUser
     });
   } catch (error) {
     res.status(500).json({ message: "Error signing up", error: error.message });
@@ -78,3 +79,59 @@ exports.verifyEmailOTP = async (req, res) => {
     }
   };
   
+  exports.getMe = async (req, res) => {
+    const { email } = req.params;
+    try {
+      const user = await userModel.getUserById(email);
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
+exports.forgotPassword = async (req, res) => {
+    // Implement forgot password logic here
+    const { email } = req.body;
+    console.log("email is: ", email)
+    try {
+      const user = await userModel.getForgetPassword(email);
+      res.status(200).json({ message: "success" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
+
+  exports.verifyPasswordOTP = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+      const isVerified = await userModel.verifyPasswordOTP(email, otp);
+      if (isVerified) {
+        res.status(200).json({ message: "Email otp verified successfully!" });
+      }
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  };
+
+exports.resetPassword = async (req, res) => {
+    const { email, password } = req.body;
+  
+    try {
+      const user = await userModel.getUserByEmail(email);
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      await userModel.resetPassword(email, password);
+  
+      res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
