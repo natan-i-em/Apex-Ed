@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRoutes = require("./routes/userRoutes");
 const courseRoutes = require("./routes/courseRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
 
 const app = express();
 
@@ -18,6 +19,9 @@ app.use(bodyParser.json());
 app.use("/auth", userRoutes);
 
 app.use("/api/courses", courseRoutes);
+
+
+app.use("/api/transactions", transactionRoutes);
 
 
 

@@ -136,6 +136,26 @@ const resetPassword = async (email, newPassword) => {
   }
 };
 
+const enrollUser = async (userId, courseId, isPaid = false) => {
+  try {
+   const result =  await db.query(
+    `INSERT INTO enrollments (user_id, course_id, is_paid, lifetime_access)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (user_id, course_id) DO NOTHING`,
+    [userId, courseId, isPaid, true]);
+    
+  return result.rows;
+
+  }catch (error) {
+    throw new Error("Error enrolling user in course: " + error.message);
+
+  }
+ 
+  return result.rows.length > 0; // true if inserted, false if already existed
+};
+
+
+
 module.exports = { saveUser, 
   getUserByEmail,
   verifyOTP,
@@ -143,4 +163,6 @@ module.exports = { saveUser,
   resetPassword,
   getUserById , 
   getForgetPassword,
-  verifyPasswordOTP};
+  verifyPasswordOTP,
+  enrollUser
+};

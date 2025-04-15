@@ -10,6 +10,18 @@ exports.getAllCourses = async (req, res) => {
     }
 };
 
+
+exports.getEnrollments = async (req, res) => {
+     const user_Id = req.body.id
+    try {
+        const result = await courseModel.getEnrolledCourses(user_Id);
+        res.status(200).json({ data: result });
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+
 exports.createCourse = async (req, res) => {
     const { title, description, thumbnail, videopath ,instractor} = req.body;
   

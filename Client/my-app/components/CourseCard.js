@@ -4,7 +4,7 @@ const CourseCard = ({ course }) => {
     return (
         <div className="bg-white p-4 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer">
           <Link href={`/course/${course.id}`}>
-            <a>
+            
               <img
                 src={course.thumbnail}
                 alt={course.title}
@@ -12,7 +12,7 @@ const CourseCard = ({ course }) => {
               />
               <h3 className="text-xl font-semibold text-gray-800">{course.title}</h3>
               <p className="text-gray-600 mt-2">{course.description}</p>
-            </a>
+            
           </Link>
         </div>
       );

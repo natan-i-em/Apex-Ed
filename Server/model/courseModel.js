@@ -12,7 +12,23 @@ const getAllCourses = async () => {
             throw new Error("Error fetching courses: " + error.message);
         }
     };
-const createCourse = async (courseData) => {
+
+    const getEnrolledCourses = async (userId) => {
+      try {
+        const query = `
+          SELECT c.* FROM enrollments e
+          JOIN courses c ON c.id = e.course_id
+          WHERE e.user_id = $1
+        `;
+        const result = await db.query(query, [userId]);
+        return result.rows;
+      } catch (error) {
+        throw error;
+      }
+    };
+       
+
+    const createCourse = async (courseData) => {
         try {      
           // Insert new course
           const insertQuery = `
@@ -112,4 +128,4 @@ const getCourseDetails = async (id) => {
     };
       
 
-module.exports = { getAllCourses ,createCourse , deleteCourse , updateCourse , getCourseDetails};
+module.exports = { getAllCourses ,createCourse , deleteCourse , updateCourse , getCourseDetails , getEnrolledCourses};
